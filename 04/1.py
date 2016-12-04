@@ -14,8 +14,8 @@ def get_checksum(entry):
     name_chars = ''.join(sorted(''.join(split_entry[:-1])))
     checksum = ''.join(sorted(Counter(name_chars))[:5])
     return ''.join([
-        v[0]
-        for v in sorted(Counter(name_chars).items(),
+        v
+        for v, _ in sorted(Counter(name_chars).items(),
         key=lambda kv: (-kv[1], kv[0]))
     ][:5])
 
