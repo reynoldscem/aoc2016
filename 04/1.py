@@ -12,7 +12,6 @@ def build_parser():
 def get_checksum(entry):
     split_entry = entry.split('-')
     name_chars = ''.join(sorted(''.join(split_entry[:-1])))
-    checksum = ''.join(sorted(Counter(name_chars))[:5])
     return ''.join([
         v
         for v, _ in sorted(Counter(name_chars).items(),
