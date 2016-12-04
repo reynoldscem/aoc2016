@@ -3,16 +3,19 @@ import numpy as np
 import argparse
 import os
 
+
 def build_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('filename')
     return parser
+
 
 def is_valid(triangle):
     for permutation in permutations(triangle):
         if np.sum(permutation[0:2]) <= permutation[2]:
             return False
     return True
+
 
 def main(args):
     with open(args.filename) as fd:
@@ -30,7 +33,6 @@ def main(args):
             valid_count += 1
 
     print(valid_count)
-
 
 
 if __name__ == '__main__':
