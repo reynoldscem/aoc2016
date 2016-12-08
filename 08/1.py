@@ -1,5 +1,16 @@
 from __future__ import print_function
 import numpy as np
+import argparse
+import os
+import re
+
+
+def build_parser():
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('filename')
+
+    return parser
 
 
 # Mask col. Get col vector. Roll by amount.
@@ -54,11 +65,36 @@ def print_rect(rect):
         print()
 
 
-if __name__ == '__main__':
-    rect = make_rect(3, 7)
-    rect = mask_ab(rect, 3, 2)
-    rect = rot_col(rect, 1, 1)
-    rect = rot_row(rect, 0, 4)
-    rect = rot_col(rect, 1, 1)
-    print_rect(rect)
+def execute_line(rect, line):
+    print(line)
+    function_lookup = {
+        'rect': mask_ab,
+        'rotate column': rot_col,
+        'rotate row': rot_row
+    }
+
+    expression = re.compile(
+        r'(rect|rotate row|rotate column) x?y?=?(\d+) ?\w+ ?(\d+)'
+    )
+    res = re.findall(expression, line)[0]
+    print(res)
+
+    return function_lookup[res[0]](rect, int(res[1]), int(res[2]))
+
+
+def main(args):
+    with open(args.filename) as fd:
+        data = fd.read().splitlines()
+
+    rect = make_rect()
+
+    for line in data:
+        rect = execute_line(rect, line)
+
     print(np.sum(rect))
+
+
+if __name__ == '__main__':
+    args = build_parser().parse_args()
+    assert os.path.isfile(args.filename), 'Must provide a valid filename'
+    main(args)
