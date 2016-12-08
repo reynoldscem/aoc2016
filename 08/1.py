@@ -87,9 +87,12 @@ def main(args):
         data = fd.read().splitlines()
 
     rect = make_rect()
+    print_rect(rect)
 
     for line in data:
+        input()
         rect = execute_line(rect, line)
+        print_rect(rect)
 
     print(np.sum(rect))
 
