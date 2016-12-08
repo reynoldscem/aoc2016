@@ -43,6 +43,16 @@ def mask_ab(rect, a, b):
     return new_rect
 
 
+def print_rect(rect):
+    for row in rect:
+        for entry in row:
+            if entry:
+                print(u'\u2588', end='')
+            else:
+                print(' ', end='')
+        print()
+
+
 def execute_line(rect, line):
     function_lookup = {
         'rect': mask_ab,
@@ -63,9 +73,12 @@ def main(args):
         data = fd.read().splitlines()
 
     rect = make_rect()
+    print_rect(rect)
 
     for line in data:
         rect = execute_line(rect, line)
+        print_rect(rect)
+        time.sleep(0.06)
 
     print(np.sum(rect))
 
