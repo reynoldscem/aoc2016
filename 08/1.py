@@ -17,16 +17,17 @@ def rot_col(rect, x, v):
 # Mask back original row.
 # Add in new rect.
 def rot_row(rect, y, v):
-    new_rect = np.copy(rect)
-
     row_mask = np.ones(rect.shape[0], dtype=np.bool)
     row_mask[y] = 0
 
-    shift = np.copy(new_rect)
-    preserve = np.copy(new_rect)
+    shift = np.copy(rect)
+    preserve = np.copy(rect)
+
     preserve[~row_mask, :] = 0
     shift[row_mask, :] = 0
+
     shifted = np.roll(shift, v)
+
     return np.logical_or(shifted, preserve)
 
 
