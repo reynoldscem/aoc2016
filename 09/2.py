@@ -17,13 +17,12 @@ def build_parser():
 
     return parser
 
+pattern = re.compile(r'\(\d+x\d+\)')
+digits = re.compile(r'\d+')
+paren = re.compile(r'^[^\(]+')
 
 @lru_cache(maxsize=None)
 def get_string_len(data):
-    pattern = re.compile(r'\(\d+x\d+\)')
-    digits = re.compile(r'\d+')
-    paren = re.compile(r'^[^\(]+')
-
     m = pattern.search(data)
     if m is None:
         return len(data)
@@ -34,9 +33,8 @@ def get_string_len(data):
 
     subseq = post_match[0:subseq_len]
     post_seq = post_match[subseq_len:]
-    res = subseq * repeat_num
 
-    return len(pre_match) + get_string_len(res) + get_string_len(post_seq)
+    return len(pre_match) + repeat_num * get_string_len(subseq) + get_string_len(post_seq)
 
 def main(args):
     with open(args.filename) as fd:
