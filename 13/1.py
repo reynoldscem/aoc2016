@@ -3,6 +3,7 @@ from itertools import permutations
 import numpy as np
 import argparse
 import time
+import math
 import re
 import os
 
@@ -19,7 +20,7 @@ def build_parser():
     return parser
 
 
-def filled(x, y, num=10):
+def filled(x, y, num=1364):
     poly = x*x + 3*x + 2*x*y + y + y*y
     bin_string = '{:b}'.format(poly+num)
     one = re.compile('1')
@@ -31,14 +32,11 @@ def filled(x, y, num=10):
     return not even
 
 
-def valid(move, grid):
+def valid(move):
     if filled(*move):
         return False
 
     if move[0] < 0 or move[1] < 0:
-        return False
-
-    if move[0] > grid.shape[1]-1 or move[1] > grid.shape[0]-1:
         return False
 
     return True
@@ -59,8 +57,7 @@ def print_grid(grid):
         print()
 
 perms = list(permutations([1, 0], 2)) + list(permutations([-1, 0], 2))
-print(perms)
-def get_neighbours(grid, current_pos):
+def get_neighbours(current_pos):
     moves = [
         (current_pos[0] + perm[0], current_pos[1] + perm[1])
         for perm in perms
@@ -68,70 +65,49 @@ def get_neighbours(grid, current_pos):
     moves = [
         move
         for move in moves
-        if valid(move, grid)
+        if valid(move)
     ]
     return moves
 
-def search(start, grid, target):
-    visited = set()
+def search(start, target):
+    visited_dist = {}
+    steps = {}
     frontier = Queue()
 
-    frontier.put((start,0))
+    frontier.put((0, start))
+    steps[start] = 0
 
+    iterations = 0
     while True:
+        iterations += 1
         if frontier.empty():
             print(':(')
             break
-        current, dist = frontier.get()
-        visited.add(current)
-
-        grid[current[1], current[0]] = 3
-        print()
-        print_grid(grid)
-        print()
-        input()
+        dist, current = frontier.get()
+        visited_dist[current] = dist
+        steps_prev = steps[current]
 
         if current == target:
-            print(dist)
+            print(iterations)
+            print(steps_prev)
             return
 
-        neighbours = get_neighbours(grid, current)
-        print(neighbours)
+        neighbours = get_neighbours(current)
         for neighbour in neighbours:
-            if neighbour not in visited:
-                frontier.put((neighbour, dist+1))
+            neighbour_dist = math.sqrt(
+                (neighbour[0] - target[0]) ** 2 +
+                (neighbour[1] - target[1]) ** 2
+            )
+            if (neighbour not in visited_dist.keys() or
+                    visited_dist[neighbour] > neighbour_dist):
+                frontier.put((neighbour_dist, neighbour))
+                steps[neighbour] = steps_prev + 1
 
 def main(args):
     with open(args.filename) as fd:
         data = fd.read().splitlines()
 
-    grid = np.zeros((7, 10))
-
-    grid[1, 1] = 2
-
-    for y in range(grid.shape[0]):
-        for x in range(grid.shape[1]):
-            if grid[y, x] == 2:
-                print('*', end='')
-                continue
-            if filled(x, y):
-                print('#', end='')
-                grid[y, x] = 1
-            else:
-                print('.', end='')
-                grid[y, x] = 0
-        print()
-    current_pos = np.array([1, 1])
-    neighbours = get_neighbours(grid, current_pos)
-
-    for neighbour in neighbours:
-        grid[neighbour[1], neighbour[0]] = 3
-
-    print()
-    print_grid(grid)
-    search((1,1), grid, (7,4))
-
-    import ipdb; ipdb.set_trace()
+    search((1,1), (31, 39))
 
 if __name__ == '__main__':
     args = build_parser().parse_args()
