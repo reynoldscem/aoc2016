@@ -1,23 +1,10 @@
 from __future__ import print_function
 from itertools import permutations
-import numpy as np
-import argparse
-import time
 import math
 import re
 import os
 
 from queue import Queue
-
-def build_parser():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('filename')
-
-    parser.add_argument(
-        '--part2',
-        action='store_true'
-    )
-    return parser
 
 
 def filled(x, y, num=1364):
@@ -40,21 +27,6 @@ def valid(move):
         return False
 
     return True
-
-def print_grid(grid):
-    for y in range(grid.shape[0]):
-        for x in range(grid.shape[1]):
-            if grid[y, x] == 2:
-                print('*', end='')
-                continue
-            if grid[y, x] == 3:
-                print('^', end='')
-                continue
-            if filled(x, y):
-                print('#', end='')
-            else:
-                print('.', end='')
-        print()
 
 perms = list(permutations([1, 0], 2)) + list(permutations([-1, 0], 2))
 def get_neighbours(current_pos):
@@ -88,7 +60,7 @@ def search(start, target):
         steps_prev = steps[current]
 
         if current == target:
-            print(iterations)
+            print('This heuristic took {} its'.format(iterations))
             print(steps_prev)
             return
 
@@ -103,13 +75,8 @@ def search(start, target):
                 frontier.put((neighbour_dist, neighbour))
                 steps[neighbour] = steps_prev + 1
 
-def main(args):
-    with open(args.filename) as fd:
-        data = fd.read().splitlines()
-
+def main():
     search((1,1), (31, 39))
 
 if __name__ == '__main__':
-    args = build_parser().parse_args()
-    assert os.path.isfile(args.filename), 'Must provide a valid filename'
-    main(args)
+    main()
