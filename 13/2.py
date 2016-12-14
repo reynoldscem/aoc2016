@@ -1,5 +1,5 @@
 from itertools import permutations, combinations
-import argparse
+from joblib import delayed, Parallel
 import math
 import re
 import os
@@ -82,11 +82,10 @@ def main():
         for y in range(0, 52)
         if not filled(x,y)
     ]
-    reachables = 0
-    for coord in coords:
-        if search((1, 1), coord):
-            reachables += 1
-    print(reachables)
+    res = Parallel(n_jobs=4)(
+        delayed(search)((1,1), coord) for coord in coords
+    )
+    print(len([ans for ans in res if ans]))
 
 if __name__ == '__main__':
     main()
