@@ -41,7 +41,7 @@ class Bot:
     def work(self, registry):
         found = False
         while not found:
-            time.sleep(random() * 0.5)
+            time.sleep(random() * 0.05)
             if self.queue.full():
                 if self.transfer_chips(registry):
                     found = True
@@ -117,23 +117,8 @@ def main(args):
         for name in bots:
             if name.startswith('bot'):
                 blocked += 1 if registry[name].blocked else 0
-        time.sleep(5)
+        time.sleep(0.5)
         print('{} / {} blocked'.format(blocked, len(bots)))
-        outs = [
-            name for name in registry.keys()
-            if name.startswith('out')
-        ]
-        print(outs)
-
-    outnames = [
-        name for name in registry.keys()
-        if name.startswith('out')
-    ]
-    for outname in outnames:
-        if outname in ['output 0', 'output 1', 'output 2']:
-            outbin = registry[outname]
-            items = [outbin.queue.get() for _ in range(outbin.queue.qsize())]
-            print(items)
 
 
 if __name__ == '__main__':

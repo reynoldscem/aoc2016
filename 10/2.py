@@ -28,9 +28,6 @@ class Bot:
         self.blocked = False
         print('{} transferring {}'.format(self.name, sorted(items)))
 
-        if items == self.target:
-            print('GOAL! {} transferring {}'.format(self.name, items))
-
         self.blocked = True
         registry[self.low_dest].queue.put(items[0])
         self.blocked = False
@@ -41,7 +38,7 @@ class Bot:
 
     def work(self, registry):
         while not self.finished:
-            time.sleep(random() * 0.5)
+            time.sleep(random() * 0.05)
             if self.queue.full():
                 self.transfer_chips(registry)
 
@@ -117,7 +114,7 @@ def main(args):
         for name in bots:
             if name.startswith('bot'):
                 blocked += 1 if registry[name].blocked else 0
-        time.sleep(5)
+        time.sleep(0.5)
         print('{} / {} blocked'.format(blocked, len(bots)))
         outs = [
             name for name in registry.keys()
