@@ -19,6 +19,7 @@ class Bot:
         self.queue = Queue(maxsize=maxsize)
         self.target = target
         self.blocked = False
+        self.finished = False
 
     def transfer_chips(self, registry):
         self.blocked = True
@@ -29,22 +30,20 @@ class Bot:
 
         if items == self.target:
             print('GOAL! {} transferring {}'.format(self.name, items))
-            return True
 
         self.blocked = True
         registry[self.low_dest].queue.put(items[0])
         self.blocked = False
+
         self.blocked = True
         registry[self.high_dest].queue.put(items[1])
         self.blocked = False
 
     def work(self, registry):
-        found = False
-        while not found:
+        while not self.finished:
             time.sleep(random() * 0.5)
             if self.queue.full():
-                if self.transfer_chips(registry):
-                    found = True
+                self.transfer_chips(registry)
 
 
 class OutBin:
@@ -107,6 +106,7 @@ def main(args):
 
     found = False
 
+    items = []
     while not found:
         for thread in threads:
             if not thread.is_alive():
@@ -125,16 +125,21 @@ def main(args):
         ]
         print(outs)
 
-    outnames = [
-        name for name in registry.keys()
-        if name.startswith('out')
-    ]
-    for outname in outnames:
-        if outname in ['output 0', 'output 1', 'output 2']:
-            outbin = registry[outname]
-            items = [outbin.queue.get() for _ in range(outbin.queue.qsize())]
-            print(items)
+        outnames = [
+            name for name in registry.keys()
+            if name.startswith('out')
+        ]
+        for outname in outnames:
+            if outname in ['output 0', 'output 1', 'output 2']:
+                outbin = registry[outname]
+                items += [outbin.queue.get() for _ in range(outbin.queue.qsize())]
 
+        if len(items) == 3:
+            prod = 1
+            for i in range(3):
+                prod *= int(items[i])
+            print(prod)
+            break
 
 if __name__ == '__main__':
     args = build_parser().parse_args()
