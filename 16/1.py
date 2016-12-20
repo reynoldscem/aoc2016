@@ -3,6 +3,7 @@ import re
 def main():
     string = '11110010111001001'
     target_len = 272
+    target_len = 35651584
 
     while len(string) <= target_len:
         string = string + '0' + ''.join(
@@ -12,7 +13,7 @@ def main():
             ]
         )
     checksum = string[:target_len]
-    print(checksum)
+    # print(checksum)
 
     while len(checksum) % 2 == 0:
         pairs = re.findall('..', checksum)
